@@ -4,7 +4,7 @@
  * Each premium user gets exactly 1 OpenClaw pod in the claw-agents namespace.
  *
  * Pod DNS (internal): agent-{userId}.claw-agents.svc.cluster.local:18789
- * Image: ghcr.io/phioranex/openclaw-docker:latest
+ * Image: node:22-alpine (public Docker Hub) + npm install -g openclaw@latest
  */
 
 const k8s = require('@kubernetes/client-node');
@@ -13,7 +13,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 const AGENTS_NAMESPACE = 'claw-agents';
-const OPENCLAW_IMAGE = 'ghcr.io/phioranex/openclaw-docker:latest';
+const OPENCLAW_IMAGE = 'node:22-alpine';   // public Docker Hub image, no GHCR needed
 const MEM_LIMIT_MI = 2048;   // 2 GiB per agent pod
 const NODE_HEAP_MB = 1536;   // --max-old-space-size for Node inside container
 
@@ -113,10 +113,16 @@ function buildDeployment(userId) {
       template: {
         metadata: { labels: { app: 'openclaw-agent', 'user-id': safeUserId } },
         spec: {
+          initContainers: [{
+            name: 'install-openclaw',
+            image: OPENCLAW_IMAGE,
+            command: ['sh', '-c', 'npm install -g openclaw@latest && cp -r /usr/local/lib/node_modules /opt/node_modules && cp /usr/local/bin/openclaw /opt/openclaw-bin'],
+            volumeMounts: [{ name: 'openclaw-install', mountPath: '/opt' }]
+          }],
           containers: [{
             name: 'openclaw',
             image: OPENCLAW_IMAGE,
-            imagePullPolicy: 'Always',
+            command: ['sh', '-c', 'cp -r /opt/node_modules /usr/local/lib/node_modules && cp /opt/openclaw-bin /usr/local/bin/openclaw && chmod +x /usr/local/bin/openclaw && openclaw gateway start --foreground --port 18789'],
             ports: [{ containerPort: 18789 }],
             env: [
               {
@@ -126,6 +132,7 @@ function buildDeployment(userId) {
               { name: 'NODE_OPTIONS', value: `--max-old-space-size=${NODE_HEAP_MB}` }
             ],
             volumeMounts: [
+              { name: 'openclaw-install', mountPath: '/opt' },
               { name: 'config', mountPath: '/home/node/.openclaw/openclaw.json', subPath: 'openclaw.json' },
               { name: 'config', mountPath: '/home/node/.openclaw/workspace/IDENTITY.md', subPath: 'IDENTITY.md' },
               { name: 'config', mountPath: '/home/node/.openclaw/workspace/mcp-bridge-tools/composio-tool.js', subPath: 'composio-tool.js' },
@@ -143,10 +150,10 @@ function buildDeployment(userId) {
               initialDelaySeconds: 40, periodSeconds: 10, failureThreshold: 9
             }
           }],
-          volumes: [{
-            name: 'config',
-            configMap: { name: `agent-config-${safeUserId}` }
-          }]
+          volumes: [
+            { name: 'openclaw-install', emptyDir: {} },
+            { name: 'config', configMap: { name: `agent-config-${safeUserId}` } }
+          ]
         }
       }
     }
