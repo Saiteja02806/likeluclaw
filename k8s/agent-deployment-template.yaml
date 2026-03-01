@@ -21,11 +21,17 @@ spec:
         app: openclaw-agent
         user-id: USER_ID
     spec:
+      initContainers:
+        - name: install-openclaw
+          image: node:22-alpine
+          command: ["sh", "-c", "npm install -g openclaw@latest && cp -r /usr/local/lib/node_modules /opt/node_modules && cp /usr/local/bin/openclaw /opt/openclaw-bin"]
+          volumeMounts:
+            - name: openclaw-install
+              mountPath: /opt
       containers:
         - name: openclaw
-          image: ghcr.io/saiteja02806/likeluclaw-openclaw-agent:latest
-          imagePullPolicy: Always
-          command: ["openclaw", "gateway", "start", "--foreground", "--port", "18789"]
+          image: node:22-alpine
+          command: ["sh", "-c", "cp -r /opt/node_modules /usr/local/lib/node_modules && cp /opt/openclaw-bin /usr/local/bin/openclaw && chmod +x /usr/local/bin/openclaw && openclaw gateway start --foreground --port 18789"]
           ports:
             - containerPort: 18789
           env:
@@ -37,6 +43,8 @@ spec:
             - name: NODE_OPTIONS
               value: "--max-old-space-size=NODE_HEAP_MB"
           volumeMounts:
+            - name: openclaw-install
+              mountPath: /opt
             - name: config-volume
               mountPath: /home/node/.openclaw
           resources:
@@ -61,6 +69,8 @@ spec:
             periodSeconds: 10
             failureThreshold: 6
       volumes:
+        - name: openclaw-install
+          emptyDir: {}
         - name: config-volume
           configMap:
             name: agent-config-USER_ID
