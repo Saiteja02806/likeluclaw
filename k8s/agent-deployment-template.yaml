@@ -23,9 +23,9 @@ spec:
     spec:
       containers:
         - name: openclaw
-          image: ghcr.io/phioranex/openclaw-docker:latest
+          image: ghcr.io/saiteja02806/likeluclaw-openclaw-agent:latest
           imagePullPolicy: Always
-          command: ["node", "/home/node/.local/bin/openclaw-gateway", "start", "--foreground"]
+          command: ["openclaw", "gateway", "start", "--foreground", "--port", "18789"]
           ports:
             - containerPort: 18789
           env:
