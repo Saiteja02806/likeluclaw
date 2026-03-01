@@ -1,0 +1,85 @@
+# Template — DO NOT apply directly.
+# This file is read by k8s-utils.js and variables are replaced at runtime.
+# Variables: USER_ID, AGENT_ID, GATEWAY_TOKEN, MEM_LIMIT_MI, NODE_HEAP_MB
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-USER_ID
+  namespace: claw-agents
+  labels:
+    app: openclaw-agent
+    user-id: USER_ID
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openclaw-agent
+      user-id: USER_ID
+  template:
+    metadata:
+      labels:
+        app: openclaw-agent
+        user-id: USER_ID
+    spec:
+      containers:
+        - name: openclaw
+          image: ghcr.io/phioranex/openclaw-docker:latest
+          imagePullPolicy: Always
+          command: ["node", "/home/node/.local/bin/openclaw-gateway", "start", "--foreground"]
+          ports:
+            - containerPort: 18789
+          env:
+            - name: OPENCLAW_GATEWAY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: agent-secret-USER_ID
+                  key: gateway-token
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=NODE_HEAP_MB"
+          volumeMounts:
+            - name: config-volume
+              mountPath: /home/node/.openclaw
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "100m"
+            limits:
+              memory: "MEM_LIMIT_MiMi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 18789
+            initialDelaySeconds: 45
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 18789
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 6
+      volumes:
+        - name: config-volume
+          configMap:
+            name: agent-config-USER_ID
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-USER_ID
+  namespace: claw-agents
+  labels:
+    app: openclaw-agent
+    user-id: USER_ID
+spec:
+  selector:
+    app: openclaw-agent
+    user-id: USER_ID
+  ports:
+    - protocol: TCP
+      port: 18789
+      targetPort: 18789
+  type: ClusterIP

@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-nginx-conf
+  namespace: claw-system
+data:
+  default.conf: |
+    server {
+        listen 80;
+        root /usr/share/nginx/html;
+        index index.html;
+
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+
+        location /assets/ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+
+        location /api/ {
+            return 404;
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: claw-frontend
+  namespace: claw-system
+  labels:
+    app: claw-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: claw-frontend
+  template:
+    metadata:
+      labels:
+        app: claw-frontend
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d
+            - name: html
+              mountPath: /usr/share/nginx/html
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "25m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 5
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: frontend-nginx-conf
+        - name: html
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: claw-frontend
+  namespace: claw-system
+  labels:
+    app: claw-frontend
+spec:
+  selector:
+    app: claw-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP

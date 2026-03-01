@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: claw-redis
+  namespace: claw-system
+  labels:
+    app: claw-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: claw-redis
+  template:
+    metadata:
+      labels:
+        app: claw-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+          args: ["--save", "", "--appendonly", "no"]
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: claw-redis
+  namespace: claw-system
+  labels:
+    app: claw-redis
+spec:
+  selector:
+    app: claw-redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  type: ClusterIP

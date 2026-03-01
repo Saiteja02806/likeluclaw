@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: claw-system
+  labels:
+    app.kubernetes.io/managed-by: likelyclaw
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: claw-agents
+  labels:
+    app.kubernetes.io/managed-by: likelyclaw

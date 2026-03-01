@@ -1,0 +1,162 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: claw-backend
+  namespace: claw-system
+  labels:
+    app: claw-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: claw-backend
+  template:
+    metadata:
+      labels:
+        app: claw-backend
+    spec:
+      serviceAccountName: claw-backend-sa
+      containers:
+        - name: backend
+          image: ghcr.io/saiteja02806/likeluclaw-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "3000"
+            - name: DOMAIN
+              value: "likelyclaw.com"
+            - name: SUPABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: claw-backend-secrets
+                  key: supabase-url
+            - name: SUPABASE_ANON_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-backend-secrets
+                  key: supabase-anon-key
+            - name: SUPABASE_SERVICE_ROLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-backend-secrets
+                  key: supabase-service-role-key
+            - name: TOKEN_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-backend-secrets
+                  key: encryption-key
+            - name: SUPABASE_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: claw-backend-secrets
+                  key: supabase-jwt-secret
+            - name: RAZORPAY_PLAN_PRO
+              valueFrom:
+                secretKeyRef:
+                  name: claw-backend-secrets
+                  key: razorpay-plan-pro
+            - name: RAZORPAY_PLAN_BASIC
+              valueFrom:
+                secretKeyRef:
+                  name: claw-backend-secrets
+                  key: razorpay-plan-basic
+            - name: RAZORPAY_PLAN_BUSINESS
+              valueFrom:
+                secretKeyRef:
+                  name: claw-backend-secrets
+                  key: razorpay-plan-business
+            - name: RAZORPAY_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: claw-backend-secrets
+                  key: razorpay-key-id
+            - name: RAZORPAY_KEY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: claw-backend-secrets
+                  key: razorpay-key-secret
+            - name: RAZORPAY_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: claw-backend-secrets
+                  key: razorpay-webhook-secret
+            - name: COMPOSIO_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-backend-secrets
+                  key: composio-api-key
+            - name: REDIS_URL
+              value: "redis://claw-redis.claw-system.svc.cluster.local:6379"
+            - name: LLM_PROXY_HOST
+              value: "claw-llm-proxy.claw-system.svc.cluster.local"
+            - name: LLM_PROXY_PORT
+              value: "3100"
+          resources:
+            requests:
+              memory: "128Mi"
+            limits:
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: claw-backend
+  namespace: claw-system
+  labels:
+    app: claw-backend
+spec:
+  selector:
+    app: claw-backend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: claw-backend-sa
+  namespace: claw-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: claw-backend-role
+rules:
+  - apiGroups: [""]
+    resources: ["namespaces", "configmaps", "secrets", "pods", "services"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: claw-backend-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: claw-backend-sa
+    namespace: claw-system
+roleRef:
+  kind: ClusterRole
+  name: claw-backend-role
+  apiGroup: rbac.authorization.k8s.io

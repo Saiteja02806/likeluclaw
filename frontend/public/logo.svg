@@ -1,0 +1,40 @@
+<svg
+  viewBox="36 51 128 98"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Infinite Symbol -->
+  <path
+    d="M50 100
+       C50 65, 95 65, 95 100
+       C95 135, 50 135, 50 100
+       Z
+       M105 100
+       C105 65, 150 65, 150 100
+       C150 135, 105 135, 105 100
+       Z"
+    stroke="#FF7A00"
+    stroke-width="14"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Claw Subtle Cut Effects -->
+  <path
+    d="M72 85 L80 100 L72 115"
+    stroke="#FF7A00"
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M128 85 L120 100 L128 115"
+    stroke="#FF7A00"
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Dot & Marketplace Minimal Accent -->
+  <circle cx="100" cy="100" r="6" fill="#FF7A00" />
+</svg>

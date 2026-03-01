@@ -1,0 +1,290 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #f97316;
+  --color-primary-hover: #ea580c;
+  --color-primary-light: #fff7ed;
+  --color-accent: #f97316;
+  --color-accent-hover: #ea580c;
+  --color-danger: #EF4444;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-muted: #6b7280;
+  --color-border: rgba(0,0,0,0.07);
+  --color-bg: #fffdfa;
+  --color-card: #ffffff;
+  --color-sidebar: #ffffff;
+  --color-sidebar-hover: #f8f7f4;
+  --color-sidebar-active: #fff4ed;
+  --color-dark: #0a0a0a;
+  --color-navy: #14213D;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: #0a0a0a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Premium Animations ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-30px) rotate(3deg); }
+}
+@keyframes float-reverse {
+  0%, 100% { transform: translateY(-15px); }
+  50% { transform: translateY(10px); }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes orbit {
+  0% { transform: rotate(0deg) translateX(120px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+}
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
+.animate-float-reverse { animation: float-reverse 7s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
+.animate-fade-in-up { animation: fade-in-up 0.8s ease-out forwards; }
+.animate-fade-in { animation: fade-in 0.3s ease-out; }
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(249,115,22,0.06), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+.animate-orbit { animation: orbit 20s linear infinite; }
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+/* Staggered delays */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-700 { animation-delay: 0.7s; }
+.delay-1000 { animation-delay: 1s; }
+
+/* Glass morphism — light theme */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.glass-light {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Light card utility */
+.card-light {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+/* Scroll-triggered fade-in */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, #f97316, #ea580c, #f97316);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Ambient glow — light theme */
+.glow-orange {
+  box-shadow: 0 0 60px rgba(249, 115, 22, 0.12), 0 0 120px rgba(249, 115, 22, 0.06);
+}
+.glow-orange-sm {
+  box-shadow: 0 0 30px rgba(249, 115, 22, 0.1);
+}
+/* Keep old name as alias */
+.glow-amber { box-shadow: 0 0 60px rgba(249, 115, 22, 0.12), 0 0 120px rgba(249, 115, 22, 0.06); }
+.glow-amber-sm { box-shadow: 0 0 30px rgba(249, 115, 22, 0.1); }
+
+/* Skeleton loading — light theme */
+.skeleton {
+  background: linear-gradient(90deg, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.05) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Enhanced Interactive States (2025 UX best practices) ── */
+
+/* Button hover glow + subtle lift — adds premium feel to CTAs */
+.btn-glow {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-glow:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 22px rgba(249, 115, 22, 0.18), 0 0 0 1px rgba(249, 115, 22, 0.1), 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+.btn-glow:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Card hover lift — light theme */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0,0,0,0.06);
+}
+
+/* Improved focus indicator — orange ring for keyboard navigation (WCAG AA) */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #fffdfa, 0 0 0 4px rgba(249, 115, 22, 0.6);
+}
+
+/* Sidebar nav hover effect — light theme */
+.nav-item {
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.nav-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+.nav-item.active {
+  background: rgba(249, 115, 22, 0.08);
+}
+
+/* Respect prefers-reduced-motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Improved page transition */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-page-enter {
+  animation: page-enter 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ── Chat UI Animations ── */
+@keyframes tool-progress {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(200%); }
+  100% { transform: translateX(-100%); }
+}
+@keyframes indeterminate-progress {
+  0% { width: 15%; margin-left: 0; }
+  25% { width: 40%; margin-left: 10%; }
+  50% { width: 20%; margin-left: 60%; }
+  75% { width: 35%; margin-left: 40%; }
+  100% { width: 15%; margin-left: 0; }
+}
+
+/* Shimmer slide for thinking indicator */
+@keyframes shimmer-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+/* ── Elegant Scrollbar (macOS-style) ── */
+/* Thin, auto-fading, minimal scrollbar */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.overflow-y-auto:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+/* WebKit (Chrome, Safari, Edge) */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+  transition: background 0.3s;
+}
+.overflow-y-auto:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Also apply to overflow-x-auto for code blocks */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 4px;
+}
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: rgba(113, 113, 122, 0.2);
+  border-radius: 999px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(113, 113, 122, 0.35);
+}
+
+/* Chat markdown — prevent double margins and ensure consistent spacing */
+.chat-markdown > *:first-child { margin-top: 0; }
+.chat-markdown > *:last-child { margin-bottom: 0; }
+.chat-markdown p + p { margin-top: 0; }
+
+/* Brand typography — clean sans-serif */
